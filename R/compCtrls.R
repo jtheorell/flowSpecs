@@ -1,0 +1,20 @@
+#' Unmixing controls
+#'
+#' This is a flowSet with 14 spectral unmixing controls:
+#' 11 single-stained bead populations, 1 unstained bead, one dead-cell-marker-
+#' stained PBMC sample, one unstained PBMC sample, working as a control for the
+#' dead cell marker, and one autofluorescence control, which is also unstained
+#' PBMC (in fact the same sample as the negative control for the dead cell
+#' marker). Data acquired on a 44 detector, 3 laser Cytek Aurora® instrument by
+#' J Theorell.
+#' Date: 2018-10-25.
+#'
+#'
+#' @docType data
+#'
+#' @usage data(unmixCtrls)
+#'
+#' @format An object of class \code{"flowSet"}
+#'
+#' @keywords datasets
+"unmixCtrls"

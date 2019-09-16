@@ -1,0 +1,252 @@
+---
+title: Example workflow for processing of raw spectral cytometry files
+author: 
+- name: Jakob Theorell
+  affiliation: 
+  - Oxford Autoimmune Neurology Group, Nuffield Department of Clinical Neurosciences, University of Oxford, Oxford, United Kingdom
+  - Department of Clinical Neurosciences, Karolinska Institutet, Stockholm, Sweden
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{Example workflow for processing of raw spectral cytometry files}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}    
+output: 
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+library(knitr)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+In this document, I aim at showing a typical analysis of a spectral cytometry
+file, including the construction of the spectral decomposition matrix, the
+actual decomposition, correction of the resulting file (as there generally
+are minor differences between the single-stained controls and the fully
+stained sample) and finally converting the resulting flowFrame or flowSet to a 
+dataframe that can be used for any downstream application. 
+
+
+# Example data description
+
+The dataset that is used in this vinjette, and that is the example dataset in 
+the package generally, is a PBMC sample stained with 12 fluorochrome-conjugated
+antibodies against a wide range of leukocyte antigens. Included is also a set
+of single-stained controls, that fill the same function with spectral cytometry
+as in conventional ditto. The files were generated on a 44 channel Cytek Aurora®
+instrument 2018-10-25. 
+```{r}
+library(flowSpecs)
+library(flowCore)
+data("unmixCtrls")
+unmixCtrls
+data('fullPanel')
+fullPanel
+```
+
+As can be noted, flowSpecs adheres to flowCore standards, and thus uses 
+flowFrames and flowSets as input to all user functions. 
+
+
+# Construction of spectral unmixing matrix
+To do this, we need the single-stained unmixing controls. As the fluorescent
+sources can be of different kinds, such as from antibodies, fluorescent 
+proteins, or dead cell markers, the specMatCalc function accepts any number 
+of different such groups. However, the groups need to have a common part of
+their names. If this was not the case during acquisition, the names of the fcs
+files can always be changed afterwards. To check the names, run the 
+sampleNames function from flowCore: 
+```{r}
+sampleNames(unmixCtrls)
+```
+
+This shows that we have three groups of samples: "Beads", "Dead" and "PBMC". The
+two first are groups that define the fluorochromes from antibodies and the dead 
+cell marker (which is pacific orange-NHS in this case). The last one, "PBMC", 
+will be used for autofluorescence correction. For obvious reasons, the autofluo
+control should always be from the same type of sample as the samples that will
+be analyzed downstream. 
+With this knowledge about the groups of samples, we can now create the matrix: 
+
+```{r}
+specMat <- specMatCalc(unmixCtrls, groupNames = c("Beads_", "Dead_"), 
+                       autoFluoName = "PBMC_unstained.fcs")
+str(specMat)
+```
+Here we can see that a matrix with the original fluorescence detector names
+as column names, and the new fluorochrome/marker names as row names has been 
+created. The function does a lot of preprocessing, with automatic gating of the
+most dominant population, etc, to ensure the best possible resolution and 
+consistency in the determination of the matrix. 
+
+# Spectral unmixing
+
+Now it is time to apply the newly constructed specMat to the fully stained 
+sample. This is done in the following way: 
+
+```{r}
+fullPanelUnmix <- specUnmix(fullPanel, specMat)
+fullPanelUnmix
+```
+Notable is that the names now have been exchanged for the fluorescent molecules
+instead of the detector channels. The algorithm below this function is currently
+least squares regression. 
+
+# Transformation
+As with all cytometry data, for correct interpretation, the data needs to be 
+transformed using one of the lin-log functions. As the arcsinh function  is 
+widely used and also has a single co-function that controls the level of 
+compression aroud zero, it is used in this package. The function has a number
+of built-in features, such as automatic detection of if the file comes from
+mass or flow cytometry, and will give differenc cofactors accordingly. It is
+however always the best practice to set the cofactors individually, to ensure
+that no artifactual populations are created, which can happen, if there is 
+too much resolution around zero. One automated strategy for this, which 
+would make the arcTrans function unnecessary, is to use the [flowVS](https://www.bioconductor.org/packages/release/bioc/html/flowVS.html) package.
+
+The arcTrans function requires the names of the variables that should be 
+transformed to be specified.
+
+```{r}
+fullPanelTrans <- arcTrans(fullPanelUnmix, transNames = 
+                             colnames(fullPanelUnmix)[6:18])
+par(mfrow=c(1,2))
+hist(exprs(fullPanelUnmix)[,7], main = "Pre transformation", 
+     xlab = "AF700_CD4", breaks = 200)
+hist(exprs(fullPanelTrans)[,7], main = "Post transformation", 
+     xlab = "AF700_CD4", breaks = 200)
+```
+As can be seen in the histograms, the ranges, scales and resolution have now 
+changed dramatically. 
+(Biologically, the three peaks correspond to CD4- cells, CD4+myeloid cells and 
+CD4+T-cells, respectively). 
+
+# Investigation of possible unmixing artifacts 
+
+An important step in the early processing of cytometry files is to investigate
+if, or rather where, unmixing artifacts have arisen. There are multiple reasons
+for the occurrence of such artifacts, but listing them are outside of the scope
+of this vinjette. In the package, there is one function that is well suited for
+for this task, and that is the oneVsAllPlot function. When used without 
+specifying a marker, the function will create a folder and save all possible
+combinations of markers to that folder. Looking at them gives a good overview
+of the data. In this case, for the vinjette purpose, I am only plotting one 
+of the multi-graphs. 
+
+```{r}
+oneVsAllPlot(fullPanelTrans, "AF647_IgM", saveResult = FALSE)
+```
+
+This shows a typical artifact between BV650_CD56 and AF647_IgM: it is 
+biologically extremely unlikely that the higher expression one sees of CD56, 
+the more extremely below zero do the values become for IgM_AF647. 
+
+# Correction of artifacts
+
+Now to one of the more controversial subjects of cytometry, that rightly causes
+alarm amongst anyone concerned about reproducibility: the correction of 
+artifacts. When this is done aided by fluorescence-minus-one controls (and an
+automated function with that purpose is being considered for this package), it 
+is less controversial, but even without them, one can follow a few rules, to
+increase the usefulness of the data. It is namely important to note, that if 
+artifacts, of the kind we will now start to correct, are left in the data, then
+they are likely to cause incorrect interpretation of the results: 
+As a rule of thumb, one can assume negative correlations for 
+single-positive markers (i.e. positive for x but negative for y) to always be
+artifacts, as true populations below a negative population cannot exist. Strong
+positive correlations are unlikely, but occur in biology, so caution and 
+biological considerations should be taken before any corrections of such are 
+attempted, but they should nonetheless be considered, as leaving them in can
+cause harm. 
+
+Normally, when correcting flow cytometry results, one just changes the 
+compensation matrix. In this case, however, where the compensation matrix is not
+symmetrical, that becomes a non-trivial affair. For that reason, this package
+introduces a correction matrix, which is a secondary, symmetric matrix only 
+meant to be used on already unmixed files. It can for that reason take both
+positive and negative values. 
+
+When starting the correction phase, we have to create an empty correction
+matrix. 
+
+```{r}
+corrMat <- corrMatCreate(specMat)
+```
+
+This is how this correction matrix is meant to be used: 
+A value of 1 corresponds to +100% correction, a value of 0, to 0% correction. 
+Thus: if the value 1 is added to the coordinate [x,y], then if event 1 has a 
+value of 50 in marker x, then event 1 will get +50 in marker y. 
+
+Practically, in our case, we see that it seems like BV650_CD56 is slightly 
+"overunmixed" from AF647_IgM. This means that we should add a negative 
+correction. Let us start with 0.1, or 10%. 
+
+```{r}
+corrMat["BV650_CD56", "AF647_IgM"] <- -0.1
+fullPanelCorr <- correctUnmix(fullPanelUnmix, corrMat)
+oneVsAllPlot(fullPanelCorr, "AF647_IgM", saveResult = FALSE)
+```
+Here, a few things can be noted. First, the correction function takes the non-
+transformed file as input. Second, there is an automatic transformation within
+this function, as it would be tedious, always having to rerun the arcTrans 
+function during this phase, that is generally quite repetitive. 
+Thrdly, we overdid it, as the population is now clearly "undermixed" instead,
+with a considerable bleed-over of CD56+ cells into the IgM marker channel. 
+Thus, we repeat it with a lower value. 
+
+```{r}
+corrMat["BV650_CD56", "AF647_IgM"] <- -0.03
+fullPanelCorr <- correctUnmix(fullPanelUnmix, corrMat)
+oneVsAllPlot(fullPanelCorr, "AF647_IgM", saveResult = FALSE)
+```
+This time, the result was satisfactory. There are other minor defects in the 
+unmixing, however, such as between AF647_IgM and PE_X. This is typically the 
+case, and as long as this needs to be done manually, it will use considerable
+time, especialy for more complex panels. 
+Notable is also that as we are just changing the correction matrix, and
+redoing the analysis from the unmixed file every time, we do not need to take
+the previous values into consideration. 
+
+# Connecting to other non-flowCore compliant applications
+Many clustering algorithms and similar take a matrix-like input. If data is
+to be combined from multiple fcs files, and clustered together, the most 
+convenient way might be to create a long data frame containing identifiers as
+separate columns from the flowSet. The flowSpecs package contains a function to
+do this. It works also for single flowFrames, but there it might be easier to
+just extract the data with the exprs() function from flowCore. 
+
+To set up our file for the task, we will convert it to a flowSet and change its
+currently non-existent name to something useful. 
+
+```{r}
+fullPanelFs <- flowSet(fullPanelTrans)
+sampleNames(fullPanelFs) <- "PBMC_full_panel_d1.fcs"
+```
+
+The function we are goning to use can chop up the name of the file into
+multiple strings, if the right information is added in a gsub-compliant
+format. These strings are then added as new columns to the resulting dataframe,
+and if the fcs files have been systematically named (or their sampleNames 
+changed to something systematic in accordance with the example above), we will
+in this way be able to group the data based on the new categorizing columns.
+
+```{r}
+fullPanelDf <- flowSet2LongDf(fullPanelFs, idInfo =
+                                list("Tissue" = "|_full_panel_..\\.fcs",
+                                     "Donor" = "...._full_panel_|\\.fcs"))
+str(fullPanelDf)
+```
+This dataframe can now be used in other applications. 
+
+# Summary
+In this vinjette, a typical spectral cytometry analysis is performed, which 
+is currently the main objective with the package. However, a number of functions
+for automatic gating, CyTOF fcs file cleanup, etc are in the pipe line and will
+be added to the package in the coming months, together with new vinjettes. 
