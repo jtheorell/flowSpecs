@@ -33,6 +33,7 @@
 #' @export specMatCalc
 specMatCalc <- function(unmixCtrls, groupNames, autoFluoName) {
 
+
     # The spectrum for each file is calculated
 
     specCalcMat <- fsApply(unmixCtrls, specCalc)
@@ -45,6 +46,19 @@ specMatCalc <- function(unmixCtrls, groupNames, autoFluoName) {
 
     singleStainGroupsList <- lapply(groupNames, function(x)
         return(specCalcMat[which(grepl(x, row.names(specCalcMat))), ]))
+
+    # Now, it is checked that if there is only one group, this group contains
+    # more than samples, to make sure that unmixing is not attempted with one
+    # color only, as this leads to some downstream negative effects, and also
+    # is more or less meaningless.
+
+    if(length(singleStainGroupsList) == 1 &&
+       nrow(singleStainGroupsList[[1]]) < 3){
+           stop("It seems like unmixing of one color is attempted, which is
+           not meaningful. Please try again with another set of controls,
+           or name them differently, if you believe that you have more than
+           one color. ")
+       }
 
 
     # Now, in each matrix in the list, the row with the lowest sum

@@ -1,3 +1,12 @@
+flowSpecs v0.9.2 (Release date: 2019-09-18)
+==============
+
+Changes:
+
+* Formal tests included for all user functions.
+* It is no longer allowed to run the specMatCalc function with only one color
+* as this leads to internal computational problems and is anyway meaningless.
+
 flowSpecs v0.9.1 (Release date: 2019-09-16)
 ==============
 
