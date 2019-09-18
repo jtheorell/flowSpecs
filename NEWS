@@ -4,6 +4,13 @@ flowSpecs v0.9.3 (Release date: 2019-09-18)
 Changes:
 
 + Submitted to BioConductor
+flowSpecs v0.99.2 (Release date: 2019-09-18)
+==============
+
+Changes:
+
++ Diminishing the size of the example data, to fit all size requirements.
+
 flowSpecs v0.99.1 (Release date: 2019-09-18)
 ==============
 
