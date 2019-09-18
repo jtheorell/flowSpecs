@@ -12,6 +12,13 @@ transformation, visualization and cleanup, and to aid further downstream
 analyses, such as with DepecheR, by enabling transformation of flowFrames
 and flowSets to dataframes. Functions for flowCore-compliant automatic
 1D-gating/filtering are in the pipe line.
+It is worth noting here that even if there are dedicated spectral cytometers,
+it is possible to increase the separation of the fluorochromes in a
+conventional flow cytometer too, by just keeping all non-used channels open.
+That will however also require the use of spectral unmixing, rather than
+compensation, as the compensation functions generally require the
+compensation matrix to be symmetrical. So please open all channels, and use
+this software!
 }
 \seealso{
 \code{\link[flowCore:flowCore-package]{flowCore}}

@@ -14,13 +14,21 @@ output:
   BiocStyle::html_document:
     titlecaps: false
     toc_float: true
+bibliography: biblio.bib
+link-citations: yes
 ---
 
 ```{r style, echo=FALSE, results='hide', message=FALSE}
 library(BiocStyle)
 library(knitr)
+library(flowCore)
+packages <- c("flowCore", 
+             "knitr",     
+             "bibtex"
+             )  
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 knitr::opts_chunk$set(echo = TRUE)
+write.bib(packages, "packages.bib")
 ```
 
 # Introduction
@@ -31,6 +39,9 @@ actual decomposition, correction of the resulting file (as there generally
 are minor differences between the single-stained controls and the fully
 stained sample) and finally converting the resulting flowFrame or flowSet to a 
 dataframe that can be used for any downstream application. 
+Note: This whole package is very much dependent on 
+**flowCore**, and much of the functionality herein works as an extention of the
+basic **flowCore** functionality. 
 
 
 # Example data description
