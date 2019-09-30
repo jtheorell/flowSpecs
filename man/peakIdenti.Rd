@@ -46,3 +46,4 @@ installation time, and the importing is thus discarded.
 \seealso{
 \code{\link[vulcan]{densityauc}}
 }
+\keyword{internal}

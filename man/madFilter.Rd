@@ -53,3 +53,4 @@ cytometry variables. The function is so far not flowCore-compliant, and thus
 not available as a direct user function, but only used internally. This
 will change soon.
 }
+\keyword{internal}

@@ -31,6 +31,7 @@
 #' Currently, this defaults to FALSE.
 #' @return flowObject of the same class as flowObj with the gates added as
 #' boolean variables to the exprs portions of the flowFrames.
+#' @keywords internal
 madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
                       nGates = 1, madSide = "both", adjust = 2,
                       nonMadFilter = "deflection", returnSepFilter = FALSE) {

@@ -23,3 +23,4 @@ or outside of the filterName filter.
 \description{
 Select events based on filter
 }
+\keyword{internal}

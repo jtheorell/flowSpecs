@@ -36,6 +36,13 @@ Note: This whole package is very much dependent on
 **flowCore**, and much of the functionality herein works as an extention of the
 basic **flowCore** functionality. 
 
+# Installation
+This is how to install the package, if that has not already been done: 
+```{r, eval = FALSE}
+if(!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("flowSpecs")
+```
 
 # Example data description
 
@@ -51,7 +58,7 @@ library(flowCore)
 data("unmixCtrls")
 unmixCtrls
 data('fullPanel')
-fullPanel
+fullPanel[,seq(4,7)]
 ```
 
 As can be noted, flowSpecs adheres to flowCore standards, and thus uses 
@@ -80,7 +87,7 @@ With this knowledge about the groups of samples, we can now create the matrix:
 
 ```{r}
 specMat <- specMatCalc(unmixCtrls, groupNames = c("Beads_", "Dead_"), 
-                       autoFluoName = "PBMC_unstained.fcs")
+                        autoFluoName = "PBMC_unstained.fcs")
 str(specMat)
 ```
 Here we can see that a matrix with the original fluorescence detector names
@@ -119,7 +126,7 @@ transformed to be specified.
 
 ```{r}
 fullPanelTrans <- arcTrans(fullPanelUnmix, transNames = 
-                             colnames(fullPanelUnmix)[6:18])
+                            colnames(fullPanelUnmix)[6:18])
 par(mfrow=c(1,2))
 hist(exprs(fullPanelUnmix)[,7], main = "Pre transformation", 
      xlab = "AF700_CD4", breaks = 200)
@@ -243,8 +250,8 @@ in this way be able to group the data based on the new categorizing columns.
 
 ```{r}
 fullPanelDf <- flowSet2LongDf(fullPanelFs, idInfo =
-                                list("Tissue" = "|_full_panel_..\\.fcs",
-                                     "Donor" = "...._full_panel_|\\.fcs"))
+        list("Tissue" = "|_full_panel_..\\.fcs", 
+             "Donor" = "...._full_panel_|\\.fcs"))
 str(fullPanelDf)
 ```
 This dataframe can now be used in other applications. 
@@ -254,3 +261,8 @@ In this vinjette, a typical spectral cytometry analysis is performed, which
 is currently the main objective with the package. However, a number of functions
 for automatic gating, CyTOF fcs file cleanup, etc are in the pipe line and will
 be added to the package in the coming months, together with new vinjettes. 
+
+# Session information
+```{r}
+sessionInfo()
+```

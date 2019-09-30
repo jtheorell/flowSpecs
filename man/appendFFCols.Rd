@@ -21,3 +21,4 @@ This function is a slightly adjusted copy of the fr_append_cols
 function in flowCore. It mainly allows for the presence of additional
 pData variables
 }
+\keyword{internal}

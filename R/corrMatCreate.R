@@ -8,6 +8,21 @@
 #' @return A symmetrical matrix of zeros with the right row- and column names.
 #' @seealso \code{\link{correctUnmix}}
 #' @importFrom BiocGenerics ncol colnames
+#' @examples
+#' # Load uncompensated data
+#' data(fullPanel)
+#'
+#' # Load the spectral unmixing matrix generated with controls from the same
+#' # experiment. These can be generated using the specMatCalc function.
+#' data(specMat)
+#'
+#' # And now unmix
+#' fullPanelUnmix <- specUnmix(fullPanel, specMat)
+#'
+#'
+#' # Create an empty unmixinng matrix
+#' corrMat <- corrMatCreate(specMat)
+#'
 #' @export corrMatCreate
 corrMatCreate <- function(specMat) {
     corrNames <- rownames(specMat)

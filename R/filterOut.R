@@ -10,6 +10,7 @@
 #' @return The flowObj, now smaller, as it only contains the data within,
 #' or outside of the filterName filter.
 #' @importFrom flowCore fsApply
+#' @keywords internal
 filterOut <- function(flowObj, filterName, withinFilter = TRUE) {
     if (withinFilter) {
         gateVal <- 1

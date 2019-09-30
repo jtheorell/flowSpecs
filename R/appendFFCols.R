@@ -5,6 +5,7 @@
 #' @param newCols The new columns that should be added.
 #' @return The focusFrame, with the newCols appended.
 #' @importFrom flowCore pData exprs parameters
+#' @keywords internal
 appendFFCols <- function(focusFrame, newCols) {
     pd <- flowCore::pData(flowCore::parameters(focusFrame))
     cn <- colnames(newCols)
@@ -26,7 +27,21 @@ appendFFCols <- function(focusFrame, newCols) {
     }))
     rownames(new_pd) <- new_pid
     pd <- rbind(pd, new_pd)
-    focusFrame@exprs <- cbind(exprs(focusFrame), newCols)
+    newExprs(focusFrame) <- cbind(exprs(focusFrame), newCols)
     flowCore::pData(flowCore::parameters(focusFrame)) <- pd
     focusFrame
 }
+
+#' This function lets us exchange a flowframes exprs portion to an unrelated one
+#' It is solely meant to be used within appendFFCols.
+#' @param x A flowFrame
+#' @param value A matrix suitable to be an exprs object.
+#' @return A new flowFrame with "value" as the exprs portion.
+#' @importFrom methods setGeneric setMethod
+#' @keywords internal
+setGeneric("newExprs<-", function(x, value) standardGeneric("newExprs<-"))
+
+setMethod("newExprs<-", "flowFrame", function(x, value) {
+    x@exprs <- value
+    x
+})

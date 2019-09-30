@@ -27,6 +27,7 @@
 #' complexity.
 #' @seealso \code{\link[vulcan]{densityauc}}
 #' @importFrom zoo rollmean
+#' @keywords internal
 peakIdenti <- function(markerData, volThresh = 0.05, distThresh = 0.1,
                        adjust = 2, nPeaks = 2, returnStats = FALSE) {
     Da <- density(markerData, adjust = adjust, na.rm = TRUE)

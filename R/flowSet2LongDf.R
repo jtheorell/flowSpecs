@@ -5,7 +5,7 @@
 #' This function is mainly used for compatibility with matrix-based clustering
 #' algorithms, such as depeche in the DepecheR package.
 #'
-#' @importFrom flowCore fsApply exprs flowSet sampleNames
+#' @importFrom flowCore fsApply exprs flowSet sampleNames description
 #' @param flowObj The flowSet or flowFrame to be converted to a dataframe.
 #' @param idInfo A list of any number of characteristics that can be derived
 #' from the file names. For each entry, a gsub specification of where to find
@@ -81,7 +81,7 @@ flowSet2LongDf <- function(flowObj, idInfo) {
 
     dateVector <- as.vector(fsApply(
         flowObj,
-        function(x) x@description$`$DATE`
+        function(x) description(x)$`$DATE`
     ))
     flowSetExprs$acqDate <-
         unlist(retrieveFlowSetNames(
@@ -94,7 +94,7 @@ flowSet2LongDf <- function(flowObj, idInfo) {
 }
 
 retrieveFlowSetNames <- function(nameVector, specFlowSet, gsubpattern) {
-    lengthList <- as.list(fsApply(specFlowSet, function(x) nrow(x@exprs)))
+    lengthList <- as.list(fsApply(specFlowSet, function(x) nrow(exprs(x))))
     nameVectorShort <- as.list(gsub(pattern = gsubpattern, "\\1", nameVector))
     return(as.vector(mapply(
         function(x, y) rep(x, times = y), nameVectorShort,

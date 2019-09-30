@@ -17,6 +17,22 @@ This function aids the correctUnmix function, to create a symmetrical
 correction matrix that should be used together with a flowframe to correct
 the errors of unmixing.
 }
+\examples{
+# Load uncompensated data
+data(fullPanel)
+
+# Load the spectral unmixing matrix generated with controls from the same
+# experiment. These can be generated using the specMatCalc function.
+data(specMat)
+
+# And now unmix
+fullPanelUnmix <- specUnmix(fullPanel, specMat)
+
+
+# Create an empty unmixinng matrix
+corrMat <- corrMatCreate(specMat)
+
+}
 \seealso{
 \code{\link{correctUnmix}}
 }

@@ -19,3 +19,4 @@ The downsampled flowObj.
 This function is a co-function to the oneVsAllPlot function, to reduce
 computational time.
 }
+\keyword{internal}
