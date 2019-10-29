@@ -1,5 +1,5 @@
 Package: flowSpecs
-Version: 0.99.4
+Version: 1.0.0
 Date: 2019-09-30
 Type: Package
 Title: Tools for processing of high-dimensional cytometry data
