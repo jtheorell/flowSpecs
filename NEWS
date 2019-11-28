@@ -1,3 +1,6 @@
+Changes in version 1.0.1 (2019-11-28)
++ bug fix enabling multiple SSC measurements when generating the unmix matrix
+
 Changes in version 0.99.4 (2019-09-30)
 + responses to BioConductor review #1
 

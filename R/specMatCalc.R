@@ -126,7 +126,7 @@ specCalc <- function(flowFrame) {
 
     # Now, a gate is applied to ssc, to clean up all files.
     sscVar <- which(grepl("SSC", focusColNames) &
-        grepl("A", focusColNames))
+        grepl("A", focusColNames))[1]
 
     sscGatedFrame <- madFilter(fscFilteredFrame, gateVar = sscVar, nMads = 1.5)
     sscFilteredFrame <- filterOut(sscGatedFrame,
