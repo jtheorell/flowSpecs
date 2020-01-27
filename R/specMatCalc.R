@@ -115,7 +115,7 @@ specCalc <- function(flowFrame) {
 
     # First, a gate is applied to FSC.A, to simplify work with cells
     fscVar <- which(grepl("FSC", focusColNames) &
-        grepl("A", focusColNames))
+        grepl("A", focusColNames))[1]
 
     fscGatedFrame <- madFilter(flowFrame, gateVar = fscVar, nMads = 1.5)
     fscFilteredFrame <- filterOut(fscGatedFrame,
