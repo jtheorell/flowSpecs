@@ -4,7 +4,9 @@
 \name{fullPanel}
 \alias{fullPanel}
 \title{A fully stained spectral cytometry sample}
-\format{An object of class \code{"flowFrame"}}
+\format{
+An object of class \code{"flowFrame"}
+}
 \usage{
 data(fullPanel)
 }

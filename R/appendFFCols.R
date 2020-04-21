@@ -1,11 +1,10 @@
-#' This function is a slightly adjusted copy of the fr_append_cols
-#' function in flowCore. It mainly allows for the presence of additional
-#' pData variables
-#' @param focusFrame The flowFrame that will get appended.
-#' @param newCols The new columns that should be added.
-#' @return The focusFrame, with the newCols appended.
+# This function is a slightly adjusted copy of the fr_append_cols
+# function in flowCore. It mainly allows for the presence of additional
+# pData variables
+# @param focusFrame The flowFrame that will get appended.
+# @param newCols The new columns that should be added.
+# @return The focusFrame, with the newCols appended.
 #' @importFrom flowCore pData exprs parameters
-#' @keywords internal
 appendFFCols <- function(focusFrame, newCols) {
     pd <- flowCore::pData(flowCore::parameters(focusFrame))
     cn <- colnames(newCols)

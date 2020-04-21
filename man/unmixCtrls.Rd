@@ -4,7 +4,9 @@
 \name{unmixCtrls}
 \alias{unmixCtrls}
 \title{Unmixing controls}
-\format{An object of class \code{"flowSet"}}
+\format{
+An object of class \code{"flowSet"}
+}
 \usage{
 data(unmixCtrls)
 }

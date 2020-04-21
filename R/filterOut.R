@@ -1,16 +1,15 @@
-#' Select events based on filter
-#'
-#'
-#' @param flowObj The fcs object to be subsetted. Both flowFrames and flowSets
-#' are accepted.
-#' @param filterName The name of the filter variable in the flow object to be
-#' used for the subsetting.
-#' @param withinFilter Should the events within or outsitde of the filter be
-#' selected?
-#' @return The flowObj, now smaller, as it only contains the data within,
-#' or outside of the filterName filter.
+# Select events based on filter
+#
+#
+# @param flowObj The fcs object to be subsetted. Both flowFrames and flowSets
+# are accepted.
+# @param filterName The name of the filter variable in the flow object to be
+# used for the subsetting.
+# @param withinFilter Should the events within or outsitde of the filter be
+# selected?
+# @return The flowObj, now smaller, as it only contains the data within,
+# or outside of the filterName filter.
 #' @importFrom flowCore fsApply
-#' @keywords internal
 filterOut <- function(flowObj, filterName, withinFilter = TRUE) {
     if (withinFilter) {
         gateVal <- 1

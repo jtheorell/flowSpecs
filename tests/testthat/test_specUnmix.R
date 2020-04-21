@@ -4,9 +4,11 @@ context("specUnmix")
 testSpecMat <- matrix(c(1,0.5,0,1), ncol = 2, nrow = 2,
                       dimnames = list(c("Res1", "Res2"),
                                       c("Start1", "Start2")))
-testFlowFrame <- flowCore::flowFrame(matrix(c(1,1,1,1), nrow = 2, ncol = 2,
-                                            dimnames = list(c(NA, NA), c("Start1",
-                                                                  "Start2"))))
+testFlowFrame <- flowCore::flowFrame(matrix(c(1,1,1,1),
+                                            nrow = 2, ncol = 2,
+                                            dimnames = list(c(NA, NA),
+                                                            c("Start1",
+                                                              "Start2"))))
 resultExprs <- exprs(specUnmix(testFlowFrame, testSpecMat))
 
 test_that("specUnmixResult1", {

@@ -1,10 +1,9 @@
-#' This function is a co-function to the oneVsAllPlot function, to reduce
-#' computational time.
-#' @param flowObj The object to downsample
-#' @param nRows The number of rows in the downsampled sample.
-#' @return The downsampled flowObj.
+# This function is a co-function to the oneVsAllPlot function, to reduce
+# computational time.
+# @param flowObj The object to downsample
+# @param nRows The number of rows in the downsampled sample.
+# @return The downsampled flowObj.
 #' @importFrom BiocGenerics nrow
-#' @keywords internal
 plotDownSample <- function(flowObj, nRows = 10000) {
     if (inherits(flowObj, "flowSet")) {
         if (sum(fsApply(flowObj, BiocGenerics::nrow)) > nRows) {

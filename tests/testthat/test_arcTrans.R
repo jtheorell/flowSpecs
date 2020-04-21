@@ -1,7 +1,7 @@
 # arcTrans
 context("arcTrans")
 value <- 5
-coFactor <- 5
+coFactor <- 3
 result <- asinh(value/coFactor)
 valueFrame <- flowCore::flowFrame(matrix(value, 1, 1, dimnames = list(NA, "Val")))
 transFrame <- arcTrans(valueFrame, transNames = colnames(valueFrame),

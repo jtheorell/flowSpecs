@@ -4,7 +4,9 @@
 \name{specMat}
 \alias{specMat}
 \title{Spectral unmixing matrix}
-\format{An object of class \code{"matrix"};}
+\format{
+An object of class \code{"matrix"};
+}
 \usage{
 data(specMat)
 }

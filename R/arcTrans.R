@@ -83,13 +83,13 @@ arcTransCoFunction <- function(focusFrame, transCoFacs, unTrans) {
     focusFrameResult <- focusFrame
     if (unTrans) {
         for (i in names(transCoFacs)) {
-            flowCore::exprs(focusFrameResult)[, i] <-
-                sinh(flowCore::exprs(focusFrame)[, i]) * transCoFacs[i]
+            exprs(focusFrameResult)[, i] <-
+                sinh(exprs(focusFrame)[, i]) * transCoFacs[i]
         }
     } else {
         for (i in names(transCoFacs)) {
-            flowCore::exprs(focusFrameResult)[, i] <-
-                asinh(flowCore::exprs(focusFrame)[, i] / transCoFacs[i])
+            exprs(focusFrameResult)[, i] <-
+                asinh(exprs(focusFrame)[, i] / transCoFacs[i])
         }
     }
 

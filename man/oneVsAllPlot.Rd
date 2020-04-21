@@ -4,8 +4,14 @@
 \alias{oneVsAllPlot}
 \title{Plotting all variables against a single variable}
 \usage{
-oneVsAllPlot(flowObj, yCol = "all", nRows = 10000,
-  plotName = "default", zeroTrim = TRUE, saveResult = TRUE)
+oneVsAllPlot(
+  flowObj,
+  yCol = "all",
+  nRows = 10000,
+  plotName = "default",
+  zeroTrim = TRUE,
+  saveResult = TRUE
+)
 }
 \arguments{
 \item{flowObj}{This is the full dataset, either a flowFrame or a flowSet,
