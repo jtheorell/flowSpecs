@@ -1,31 +1,32 @@
-# Peak identification for higher-level functions.
-#
-# This function is primarily thought to be used internally to define peaks
-# in data.
-# One function is borrowed from package vulcan, namely the vulcan::densityauc,
-# which is neat, but the package is large and significantly increases the
-# installation time, and the importing is thus discarded.
-# @param markerData The data that the peaks should be identified for
-# @param volThresh The cutoff ratio of the volume for each secondary peak,
-# under which it is not considered to be a peak
-# @param distThresh The cutoff under which two peaks are considered one, as
-# they are too close to each other. This value between 0 and 1 corresponds to a
-# fraction from the 10th to the 90th percentile of the data range that the
-# peaks must be separated by to count. Defaults to 0.1 or 10 percent of the
-# distance.
-# @param adjust The value deciding the accuracy of the density calculation. The
-# higher the value, the lower the sensitivity for small aberrations in the
-# density.
-# @param nPeaks The number of peaks that should be exported. If n+1
-# fulfilling the volRatio criterion are found, the peaks most separated in
-# space are chosen.
-# @param returnStats Should the deflection points defining the peaks, the peak
-# hight and the lowest deflection point between the two most extreme peaks
-# be included in the export?
-# @return The information about the peaks in question. Depending on if
-# returnStats is TRUE or not and the number of peaks, it will change in
-# complexity.
-# @seealso \code{\link[vulcan]{densityauc}}
+#' Peak identification for higher-level functions.
+#'
+#' This function is primarily thought to be used internally to define peaks
+#' in data.
+#' One function is borrowed from package vulcan, namely the vulcan::densityauc,
+#' which is neat, but the package is large and significantly increases the
+#' installation time, and the importing is thus discarded.
+#' @param markerData The data that the peaks should be identified for
+#' @param volThresh The cutoff ratio of the volume for each secondary peak,
+#' under which it is not considered to be a peak
+#' @param distThresh The cutoff under which two peaks are considered one, as
+#' they are too close to each other. This value between 0 and 1 corresponds to a
+#' fraction from the 10th to the 90th percentile of the data range that the
+#' peaks must be separated by to count. Defaults to 0.1 or 10 percent of the
+#' distance.
+#' @param adjust The value deciding the accuracy of the density calculation. The
+#' higher the value, the lower the sensitivity for small aberrations in the
+#' density.
+#' @param nPeaks The number of peaks that should be exported. If n+1
+#' fulfilling the volRatio criterion are found, the peaks most separated in
+#' space are chosen.
+#' @param returnStats Should the deflection points defining the peaks, the peak
+#' hight and the lowest deflection point between the two most extreme peaks
+#' be included in the export?
+#' @return The information about the peaks in question. Depending on if
+#' returnStats is TRUE or not and the number of peaks, it will change in
+#' complexity.
+#' @seealso \code{\link[vulcan]{densityauc}}
+#' @keywords internal
 #' @importFrom zoo rollmean
 peakIdenti <- function(markerData, volThresh = 0.05, distThresh = 0.1,
                        adjust = 2, nPeaks = 2, returnStats = FALSE) {
