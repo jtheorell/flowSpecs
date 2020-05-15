@@ -1,3 +1,6 @@
+Changes in version 1.3.2 (2020-05-15)
++ Addition of peakNorm and associated test.
+
 Changes in version 1.3.1 (2020-05-15)
 + Bug fix in arcTrans.
 + Correcting the way specUnmix exchanges exprs objects.
