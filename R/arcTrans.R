@@ -57,7 +57,7 @@ arcTrans <- function(flowObj, transNames, transCoFacs = "default",
                 transNames = transNames
             )
         } else if (is.numeric(transCoFacs)) {
-            rep(transCoFacs, length(transNames))
+            transCoFacs <- rep(transCoFacs, length(transNames))
             names(transCoFacs) <- transNames
         }
     } else {

@@ -35,20 +35,41 @@ specUnmix <- function(flowObj, specMat) {
 }
 
 specUnmixCoFunction <- function(focusFrame, specMat) {
-    rawData <- exprs(focusFrame)[, colnames(specMat)]
+    fullExprs <- exprs(focusFrame)
+    rawData <- fullExprs[, colnames(specMat)]
     # Make the least squares fit based on the raw, uncompensated data.
     ls_corr <- lsfit(x = t(specMat), y = t(rawData), intercept = FALSE)
     # Export the unmixed portion of the least squares result.
     unmixResult <- t(ls_corr$coefficients)
+    #Now, insert the columns in their places, if they were there.
+    #Otherwise, put the non-compensated ones first, and the compensated
+    #ones after.
+    if(length(which(row.names(specMat) %in% colnames(fullExprs))) > 1){
+        fullExprs[, colnames(specMat)] <- unmixResult
+        exprs(focusFrame) <- fullExprs
+    } else {
+        #In the case that we do spectral unmixing, a few things
+        #need to be fiddled with to get the flowFrame right.
+        newExprs(focusFrame) <-
+            cbind(fullExprs[
+                , -which(colnames(fullExprs) %in% colnames(specMat))],
+                unmixResult)
+        locParamDat <- pData(parameters(focusFrame))
+        #Now, we separate the portions that are changed and unchanged.
+        locParamDatOld <-
+            locParamDat[-which(colnames(fullExprs) %in% colnames(specMat)),]
+        locParamDatNew <-
+            locParamDat[
+                which(colnames(fullExprs) %in% colnames(specMat)),][
+                    seq_len(ncol(unmixResult)),]
+        locParamDatMerge <- rbind(locParamDatOld, locParamDatNew)
+        locParamDatMerge$name <- colnames(exprs(focusFrame))
+        locParamDatMerge$desc <- colnames(exprs(focusFrame))
+        row.names(locParamDatMerge) <-
+            paste0("$P", seq_along(colnames(exprs(focusFrame))))
+        pData(parameters(focusFrame)) <- locParamDatMerge
 
-    fullResult <- cbind(
-        exprs(focusFrame)[, -which(colnames(focusFrame) %in%
-            colnames(specMat))],
-        unmixResult
-    )
-    fullResultFF <- focusFrame[, seq_len(ncol(fullResult))]
-    BiocGenerics::colnames(fullResultFF) <- colnames(fullResult)
-    exprs(fullResultFF) <- fullResult
+    }
 
-    return(fullResultFF)
+    return(focusFrame)
 }

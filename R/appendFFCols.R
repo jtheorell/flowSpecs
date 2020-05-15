@@ -30,17 +30,3 @@ appendFFCols <- function(focusFrame, newCols) {
     flowCore::pData(flowCore::parameters(focusFrame)) <- pd
     focusFrame
 }
-
-#' This function lets us exchange a flowframes exprs portion to an unrelated one
-#' It is solely meant to be used within appendFFCols.
-#' @param x A flowFrame
-#' @param value A matrix suitable to be an exprs object.
-#' @return A new flowFrame with "value" as the exprs portion.
-#' @importFrom methods setGeneric setMethod
-#' @keywords internal
-setGeneric("newExprs<-", function(x, value) standardGeneric("newExprs<-"))
-
-setMethod("newExprs<-", "flowFrame", function(x, value) {
-    x@exprs <- value
-    x
-})
