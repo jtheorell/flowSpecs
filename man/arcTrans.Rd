@@ -45,10 +45,9 @@ colnames(fullPanelUnmixed)
 transNames <- colnames(fullPanelUnmixed)[seq(6,18)]
 
 # ow, transform this file, with the default transformation factor of 400.
-# NB! It is alway advisable to check the data for the most optimal
-# transformation factors. For flow cytometry data, this can potentially be
-# done using the flowVS package:
-# https://www.bioconductor.org/packages/release/bioc/html/flowVS.html
+# NB! It is alway advisable to visually (or computationally) check the data
+# for the most optimal transformation factors. These often vary from marker
+# to marker.
 
 fullPanelTrans <- arcTrans(fullPanelUnmixed, transNames)
 

@@ -1,3 +1,7 @@
+Changes in version 1.3.3 (2020-09-03)
++ Changes to two tests due to minor errors
++ Excluding the recommendation to use flowVS, due to its deprecation.
+
 Changes in version 1.3.2 (2020-05-15)
 + Addition of peakNorm and associated test.
 
