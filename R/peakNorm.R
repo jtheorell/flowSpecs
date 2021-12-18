@@ -75,7 +75,7 @@ peakNorm <- function(fs, ctrlPos, standFF, transNames = FALSE, transCoFacs,
     }
 
     #And now we normalize data. First, we identify the values in the control
-    #Frame, and then we apply them to all values in the flowset.
+    #frame, and then we apply them to all values in the flowset.
     peakVals <- lapply(
         list(exprs(standTrans),
              exprs(fsTrans[[ctrlPos]])), function(x){

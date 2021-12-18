@@ -28,12 +28,18 @@
 # higher the value, the lower the sensitivity for small aberrations in the
 # density.
 # @param returnSepFilter Should the gate be returned as a separate object?
-# Currently, this defaults to FALSE.
-# @return flowObject of the same class as flowObj with the gates added as
-# boolean variables to the exprs portions of the flowFrames.
+# Currently, this defaults to FALSE. Incompatible with returnGateVals = TRUE.
+# @param returnGateVals Should only the gate value(s) be returned? Currently, this
+# defaults to FALSE. Incompatible with returnSepFilter = TRUE.
+# @return If returnSepFilter and returnGateVals are both FALSE, flowObject of
+# the same class as flowObj with the gates added as boolean variables to the
+# exprs portions of the flowFrames. Otherwise, either a matrix containing the
+# information on which cells that belong to whcih gate, or just a vector
+# of gate values.
 madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
                       nGates = 1, madSide = "both", adjust = 2,
-                      nonMadFilter = "deflection", returnSepFilter = FALSE) {
+                      nonMadFilter = "deflection", returnSepFilter = FALSE,
+                      returnGateVals = FALSE ) {
     # First, the gateVar is converted to an integer, if specified as a string
 
     if (madSide == "none" && nonMadFilter == "none") {
@@ -43,6 +49,11 @@ madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
     if (nGates > 1 && madSide != "both" && nonMadFilter == "none") {
         stop("The combination of multiple gates with no nonMadFilter would lead
              to overlapping gates")
+    }
+
+    if (returnSepFilter && returnGateVals){
+        stop("Either the gate value or the result of applying this value",
+             " is returned, not both")
     }
 
     if (is.character(gateVar)) {
@@ -63,7 +74,8 @@ madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
             nGates = nGates, madSide = madSide,
             nonMadFilter = nonMadFilter,
             adjust = adjust,
-            returnSepFilter = returnSepFilter
+            returnSepFilter = returnSepFilter,
+            returnGateVals = returnGateVals
         )
     } else if (inherits(flowObj, "flowFrame")) {
         resultObj <- madFilterCoFunction(flowObj,
@@ -73,7 +85,8 @@ madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
             nGates = nGates, madSide = madSide,
             nonMadFilter = nonMadFilter,
             adjust = adjust,
-            returnSepFilter = returnSepFilter
+            returnSepFilter = returnSepFilter,
+            returnGateVals = returnGateVals
         )
     } else {
         stop("The flowObj needs to be either a flowSet or a flowFrame")
@@ -85,7 +98,7 @@ madFilter <- function(flowObj, gateVar = 1, nMads = 2, filterName = "default",
 madFilterCoFunction <- function(focusFrame, gateVar, nMads,
                                 filterName, nGates,
                                 madSide, nonMadFilter,
-                                adjust, returnSepFilter) {
+                                adjust, returnSepFilter, returnGateVals) {
     focusVar <- exprs(focusFrame[, gateVar])[, 1]
 
     peakPlaces <- peakIdenti(focusVar,
@@ -114,14 +127,30 @@ madFilterCoFunction <- function(focusFrame, gateVar, nMads,
                 ) * nMads))
     }
 
-    # And now, the gates are created, according to the settings above
-    gateVecList <- lapply(seq_along(peakPlaces[[1]]), function(x)
-        madVecCreation(
+    # And now, the gates are created, according to the settings above.
+
+
+    gateValList <- lapply(seq_along(peakPlaces[[1]]), function(x)
+        madGateValsCreation(
             focusVar = focusVar, lowMad = lowMads[[x]],
             highMad = highMads[[x]], lowPeakEnd = peakPlaces[[2]][[x]][1],
             highPeakEnd = peakPlaces[[2]][[x]][2], madSide = madSide,
             nonMadFilter = nonMadFilter
         ))
+    #And this list is exported, if the interest lies mainly in the gate values
+    #and not in transforming the whole dataset
+    if (returnGateVals) {
+        return(gateValList)
+    }
+    #If we are interested in getting the actual information about the cells,
+    #we get that information here.
+    gateVecList <- lapply(seq_along(peakPlaces[[1]]), function(x){
+        locVec <- rep(0, times = length(focusVar))
+        locVec[which(focusVar >= gateValList[[x]][1] &
+                         focusVar < gateValList[[x]][2])] <- 1
+        locVec
+    }
+    )
 
     if (length(peakPlaces[[1]]) > 1) {
         gateVecMat <- do.call("cbind", gateVecList)
@@ -133,10 +162,13 @@ madFilterCoFunction <- function(focusFrame, gateVar, nMads,
         colnames(gateVecMat) <- filterName
     }
 
+    #Here, we export if we do not want the data to be integrated into the
+    #flowset
     if (returnSepFilter) {
         return(gateVecMat)
     }
-    # And finally, the gates are added as new variables to the flowFrame.
+    #If we do want the data to be integrated in the flowSet, here is the place
+    #to do so
     focusFrame <- appendFFCols(focusFrame, gateVecMat)
 }
 
@@ -147,26 +179,48 @@ peakMadCalc <- function(focusHalfPeak, peakVal) {
     return(mad(focusPeak))
 }
 
-madVecCreation <- function(focusVar, lowMad, highMad, lowPeakEnd,
+#madVecCreation <- function(focusVar, lowMad, highMad, lowPeakEnd,
+#                           highPeakEnd, madSide, nonMadFilter) {
+#    resultVar <- rep(0, times = length(focusVar))
+#    if (madSide == "both") {
+#        resultVar[which(focusVar >= lowMad & focusVar < highMad)] <- 1
+#    } else if (nonMadFilter == "deflection") {
+#        if (madSide == "low") {
+#            resultVar[which(focusVar >= lowMad & focusVar < highPeakEnd)] <- 1
+#        } else if (madSide == "high") {
+#            resultVar[which(focusVar >= lowPeakEnd & focusVar < highMad)] <- 1
+#        } else {
+#            resultVar[which(focusVar >= lowPeakEnd & focusVar < highPeakEnd)] <-
+#                1
+#        }
+#    } else {
+#        if (madSide == "low") {
+#            resultVar[which(focusVar >= lowMad)] <- 1
+#        } else if (madSide == "high") {
+#            resultVar[which(focusVar < highMad)] <- 1
+#        }
+#    }
+#    return(resultVar)
+#}
+
+madGateValsCreation <- function(focusVar, lowMad, highMad, lowPeakEnd,
                            highPeakEnd, madSide, nonMadFilter) {
-    resultVar <- rep(0, times = length(focusVar))
     if (madSide == "both") {
-        resultVar[which(focusVar >= lowMad & focusVar < highMad)] <- 1
+        c(lowMad,highMad)
     } else if (nonMadFilter == "deflection") {
         if (madSide == "low") {
-            resultVar[which(focusVar >= lowMad & focusVar < highPeakEnd)] <- 1
+            c(lowMad,highPeakEnd)
         } else if (madSide == "high") {
-            resultVar[which(focusVar >= lowPeakEnd & focusVar < highMad)] <- 1
+            c(lowPeakEnd,highMad)
         } else {
-            resultVar[which(focusVar >= lowPeakEnd & focusVar < highPeakEnd)] <-
-                1
+            c(lowPeakEnd,highPeakEnd)
         }
     } else {
         if (madSide == "low") {
-            resultVar[which(focusVar >= lowMad)] <- 1
+            c(lowMad,max(focusVar))
         } else if (madSide == "high") {
-            resultVar[which(focusVar < highMad)] <- 1
+            c(min(focusVar),highMad)
         }
     }
-    return(resultVar)
 }
+

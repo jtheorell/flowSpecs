@@ -1,3 +1,7 @@
+Changes in version 1.7.1 (2021-12-18)
++ Introduction of a dirName parameter to the oneVsAllPlot function.
++ Increased versatility for the madFilter function.
+
 Changes in version 1.3.3 (2020-09-03)
 + Changes to two tests due to minor errors
 + Excluding the recommendation to use flowVS, due to its deprecation.
