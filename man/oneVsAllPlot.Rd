@@ -9,7 +9,9 @@ oneVsAllPlot(
   yCol = "all",
   nRows = 10000,
   plotName = "default",
+  dirName = "All_vs_all_plots",
   zeroTrim = TRUE,
+  hexBins = 30,
   saveResult = TRUE
 )
 }
@@ -28,10 +30,14 @@ is 100000.}
 \item{plotName}{If a name different from yCol should be used, it can be added
 here.}
 
+\item{dirName}{Add a custom directory name.}
+
 \item{zeroTrim}{In the case of CyTOF data, the events at zero can often
 be so dominant, that all other density variation is dwarfed, and thus
 invisible. With this command, the events that are zero in both y
 and x are trimmed for each x separately.}
+
+\item{hexBins}{How many bins should the hexagonal plots be divided in?}
 
 \item{saveResult}{Should the result be saved as a file?}
 }

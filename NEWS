@@ -1,3 +1,7 @@
+Changes in version 1.9.2 (2022-02-15)
++ Adding a hexBin parameter to the oneVsAllPlot function
++ Adding the dependency hexbin.
+
 Changes in version 1.9.1 (2021-12-18)
 + Introduction of a dirName parameter to the oneVsAllPlot function.
 + Increased versatility for the madFilter function.

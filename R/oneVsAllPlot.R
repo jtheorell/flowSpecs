@@ -18,6 +18,7 @@
 #' be so dominant, that all other density variation is dwarfed, and thus
 #' invisible. With this command, the events that are zero in both y
 #' and x are trimmed for each x separately.
+#' @param hexBins How many bins should the hexagonal plots be divided in?
 #' @param saveResult Should the result be saved as a file?
 #' @return A plot with one 2D-graph for each variable that the y-variable
 #' should be plotted against.
@@ -55,9 +56,9 @@
 #' @export oneVsAllPlot
 oneVsAllPlot <- function(flowObj, yCol = "all", nRows = 10000,
                          plotName = "default", dirName = "All_vs_all_plots",
-                         zeroTrim = TRUE, saveResult = TRUE) {
+                         zeroTrim = TRUE, hexBins = 30, saveResult = TRUE) {
     plotExprs <- plotDownSample(flowObj, nRows)
-
+    
     if (yCol == "all") {
         dir.create(dirName)
         bplapply(seq_along(colnames(plotExprs)), function(x) {
@@ -65,6 +66,7 @@ oneVsAllPlot <- function(flowObj, yCol = "all", nRows = 10000,
                 plotExprs = plotExprs, yCol = x,
                 plotName = plotName,
                 zeroTrim = zeroTrim,
+                hexBins = hexBins,
                 saveResult = saveResult,
                 dirName = dirName
             )
@@ -74,26 +76,27 @@ oneVsAllPlot <- function(flowObj, yCol = "all", nRows = 10000,
             plotExprs = plotExprs, yCol = yCol,
             plotName = plotName,
             zeroTrim = zeroTrim,
+            hexBins = hexBins,
             saveResult = saveResult
         )
     }
 }
 
-oneVsAllPlotCoFunction <- function(plotExprs, yCol, plotName, zeroTrim,
+oneVsAllPlotCoFunction <- function(plotExprs, yCol, plotName, zeroTrim, hexBins,
                                    saveResult, dirName = ".") {
     # If the yCol is given as a character, it is converted to the correct number
     # here
     if (is.character(yCol)) {
         yCol <- which(colnames(plotExprs) == yCol)
     }
-
+    
     if (plotName == "default") {
         plotName <- file.path(dirName, colnames(plotExprs)[yCol])
     }
-
+    
     # Here, a separate y-name is created
     yName <- colnames(plotExprs)[yCol]
-
+    
     # Now, the data is truncated, to minimize influence by individual events
     # on the display
     plotExprs <- apply(plotExprs, 2, function(x) {
@@ -103,16 +106,16 @@ oneVsAllPlotCoFunction <- function(plotExprs, yCol, plotName, zeroTrim,
         x[x < low] <- low
         return(x)
     })
-
+    
     # Here, the dataset is converted into a long format.
     longPlot <- melt(as.data.frame(plotExprs))
     longPlot$Y <- rep(plotExprs[, yCol], times = ncol(plotExprs))
-
+    
     # Here, the double negative events are made NA for each x separately
     if (zeroTrim == TRUE) {
         longPlot[which(longPlot$value == 0 & longPlot$Y == 0), 2:3] <- c(NA, NA)
     }
-
+    
     # Now, the plots are created.
     # Before this, we are just formally defining vale and Y, for the sake of
     # notes in CMD check.
@@ -120,7 +123,7 @@ oneVsAllPlotCoFunction <- function(plotExprs, yCol, plotName, zeroTrim,
     Y <- 0
     p <- ggplot(longPlot, aes(x = value, y = Y)) +
         facet_wrap(~variable, scales = "free") +
-        geom_hex(na.rm = TRUE) +
+        geom_hex(na.rm = TRUE, bins = hexBins) +
         scale_fill_gradientn(colours = c(
             "#440154FF", "#38598CFF", "#2D708EFF",
             "#25858EFF", "#1E9B8AFF", "#2BB07FFF",

@@ -1,5 +1,5 @@
 Package: flowSpecs
-Version: 1.9.1
+Version: 1.9.2
 Date: 2021-12-18
 Type: Package
 Title: Tools for processing of high-dimensional cytometry data
@@ -20,10 +20,10 @@ BugReports: https://github.com/jtheorell/flowSpecs/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: R (>= 4.0)
 Imports: ggplot2 (>= 3.1.0), BiocGenerics (>= 0.30.0), BiocParallel (>= 1.18.1), 
         Biobase (>= 2.48.0), reshape2 (>= 1.4.3), flowCore (>= 1.50.0), 
-        zoo (>= 1.8.6), stats (>= 3.6.0), methods (>= 3.6.0)
+        zoo (>= 1.8.6), stats (>= 3.6.0), methods (>= 3.6.0), hexbin (>= 1.28.2)
 Suggests: testthat, knitr, rmarkdown, BiocStyle, DepecheR
 VignetteBuilder: knitr
