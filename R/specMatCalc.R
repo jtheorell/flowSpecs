@@ -5,7 +5,10 @@
 #' negative controls, including an autofluorescence control and estimates the
 #' unmixing for all fluorescent variables.
 #' @param unmixCtrls A flowSet containing all the single stained and
-#' unstained files necessary to create an spectral unmixing matrix.
+#' unstained files necessary to create an spectral unmixing matrix. These can 
+#' but do not have to, contain a negative control. Such a negative control will
+#' not be used, and instead an universal negative control needs to be included
+#' for each sample type present among the single-stained controls. 
 #' @param groupNames A character vector containing strings common to the groups
 #' of non-autofluoresence unmixCtrls that could be present. If for example
 #' all antibodies single stains are anti-mouse bead-based the dead cell marker
@@ -16,6 +19,7 @@
 #' @return A data frame with each row representing a fluorochrome or
 #' or autofluorescence and each column representing a detector.
 #' @importFrom BiocGenerics colnames ncol
+#' @importFrom stats var
 #' @examples
 #' # Load suitable unmixing controls. NB! If these originate from different
 #' # sample types, such as beads and PBMC, there should be a negative control
@@ -138,6 +142,23 @@ specCalc <- function(flowFrame) {
     # Here, all non-fluorescent channels are excluded
     fluoFrame <- sscFilteredFrame[, -which(grepl("ime", focusColNames) |
         grepl("SC", focusColNames))]
+    
+    #Now, if two peaks are present in any channels, then the top peak will
+    #be selected. 
+    topVar <- which.max(apply(exprs(fluoFrame), 2, var))
+    
+    transDat <- arcTrans(fluoFrame, colnames(fluoFrame)[topVar])
+    
+    #Are two peaks present?
+    nPeaks <- peakIdenti(exprs(transDat[,topVar]))
+    
+    #If so, only the top peak events are used
+    if(length(nPeaks) == 2){
+        gateVals <- madFilter(transDat, topVar, nGates = 2, 
+                              returnGateVals = TRUE)[[2]]
+        fluoFrame <- fluoFrame[which(transDat[,topVar] > gateVals[1] &
+                                         transDat[,topVar] < gateVals[2]),]
+    }
     # Then the median is calculated for all fluorescence channels on this
     # filtered population
     fluoColNames <- BiocGenerics::colnames(fluoFrame)

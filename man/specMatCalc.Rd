@@ -8,7 +8,10 @@ specMatCalc(unmixCtrls, groupNames, autoFluoName)
 }
 \arguments{
 \item{unmixCtrls}{A flowSet containing all the single stained and
-unstained files necessary to create an spectral unmixing matrix.}
+unstained files necessary to create an spectral unmixing matrix. These can 
+but do not have to, contain a negative control. Such a negative control will
+not be used, and instead an universal negative control needs to be included
+for each sample type present among the single-stained controls.}
 
 \item{groupNames}{A character vector containing strings common to the groups
 of non-autofluoresence unmixCtrls that could be present. If for example

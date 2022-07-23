@@ -93,8 +93,9 @@ str(specMat)
 Here we can see that a matrix with the original fluorescence detector names
 as column names, and the new fluorochrome/marker names as row names has been 
 created. The function does a lot of preprocessing, with automatic gating of the
-most dominant population, etc, to ensure the best possible resolution and 
-consistency in the determination of the matrix. 
+most dominant population, as well as picking out the positive population if a 
+negative control was included in each sample, etc, to ensure the best possible 
+resolution and consistency in the determination of the matrix. 
 
 # Spectral unmixing
 

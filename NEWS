@@ -1,3 +1,8 @@
+Changes in version 1.11,1 (2022-07-23)
++ Updating the specMatCalc function, to allow for inclusion of samples with an
+  internal negative control.
++ Removing the dependency hexbin, as it is not in use (ggplot2 since 1.9.3)
+
 Changes in version 1.9.2 (2022-02-15)
 + Adding a hexBin parameter to the oneVsAllPlot function
 + Adding the dependency hexbin.
