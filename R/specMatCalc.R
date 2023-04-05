@@ -121,27 +121,24 @@ specCalc <- function(flowFrame) {
     fscVar <- which(grepl("FSC", focusColNames) &
         grepl("A", focusColNames))[1]
 
-    fscGatedFrame <- madFilter(flowFrame, gateVar = fscVar, nMads = 1.5)
-    fscFilteredFrame <- filterOut(fscGatedFrame,
-        filterName = "FSC-A_auto_filter"
-    )[
-        , seq(1, BiocGenerics::ncol(flowFrame))
-    ]
+    fscGateVals <- madFilter(flowFrame, gateVar = fscVar, nMads = 1.5,
+                               returnGateVals = TRUE)[[1]]
+    fscVarDat <- exprs(flowFrame)[,fscVar]
+    fscFilteredFrame <- flowFrame[which(fscVarDat > fscGateVals[1] &
+                                            fscVarDat < fscGateVals[2]),]
 
-    # Now, a gate is applied to ssc, to clean up all files.
+    # Now, a similar gate is applied to ssc, to clean up all files.
     sscVar <- which(grepl("SSC", focusColNames) &
-        grepl("A", focusColNames))[1]
-
-    sscGatedFrame <- madFilter(fscFilteredFrame, gateVar = sscVar, nMads = 1.5)
-    sscFilteredFrame <- filterOut(sscGatedFrame,
-        filterName = "SSC-A_auto_filter"
-    )[
-        , seq(1, BiocGenerics::ncol(flowFrame))
-    ]
+                        grepl("A", focusColNames))[1]
+    
+    sscGateVals <- madFilter(fscFilteredFrame, gateVar = sscVar, nMads = 1.5,
+                             returnGateVals = TRUE)[[1]]
+    sscVarDat <- exprs(fscFilteredFrame)[,sscVar]
+    sscFilteredFrame <- fscFilteredFrame[which(sscVarDat > sscGateVals[1] &
+                                            sscVarDat < sscGateVals[2]),]
 
     # Here, all non-fluorescent channels are excluded
-    fluoFrame <- sscFilteredFrame[, -which(grepl("ime", focusColNames) |
-        grepl("SC", focusColNames))]
+    fluoFrame <- sscFilteredFrame[, -grep("ime|SC|ort|ate|omp", focusColNames)]
     
     #Now, if two peaks are present in any channels, then the top peak will
     #be selected. 
